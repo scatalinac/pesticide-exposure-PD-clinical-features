@@ -24,6 +24,13 @@ model_binary <- glm(
 vc <- vcovCL(model_binary, cluster = Matched_data$subclass)
 coeftest(model_binary, vcov. = vc)
 ```
+#### 1.1 OR, CI, p value
+
+```{r}
+OR <- exp(coef(model_binary))
+CI <- exp(confint.default(model_binary))
+p  <- coeftest(model_binary, vcov. = vc)[, "Pr(>|z|)"]
+```
 
 ### 2 Linear regression
 
@@ -38,17 +45,24 @@ vc <- vcovCL(model_continuous, cluster = Matched_data$subclass)
 coeftest(model_continuous, vcov. = vc)
 ```
 
+#### 2.1 Beta, CI, p value
+```{r}
+Beta <- coef(model_continuous)
+CI   <- confint.default(model_continuous)
+p    <- coeftest(model_continuous, vcov. = vc)[, "Pr(>|t|)"]
+```
+
 ### 3 Linear regression MDS-UPDRS Part III (adjusted for ON/OFF medication state)
 
 ```{r}
-model_continuous_onmed <- lm(
+model_mdsupdrs3 <- lm(
   outcome_continuous ~ Exposure_Group + sex + study_visit_age + disease_duration +
     HY + yrs_education + living_environment + Farming + led + On_Med,
   data = Matched_data
 )
 
-vc <- vcovCL(model_continuous_onmed, cluster = Matched_data$subclass)
-coeftest(model_continuous_onmed, vcov. = vc)
+vc <- vcovCL(model_mdsupdrs3, cluster = Matched_data$subclass)
+coeftest(model_mdsupdrs3, vcov. = vc)
 ```
 
 ```
