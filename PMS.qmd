@@ -1,0 +1,95 @@
+---
+title: "PMS"
+format: html
+editor: visual
+---
+
+```{}
+
+```
+### 1 PMS
+
+```{r}
+library(MatchIt)
+library(cobalt)
+Data <- read.csv("Data/Data.csv")
+
+set.seed(8703)
+
+Match.COPN <- matchit(
+  Exposure_Group ~ sex + study_visit_age + disease_duration + HY + yrs_education + living_environment + Farming + led,
+  data = Data,
+  method = "nearest",
+  distance = "logit",
+  caliper = 0.1,
+  stds.caliper = TRUE,
+  ratio = 1
+)
+
+Matched_data <- match.data(Match.COPN)
+```
+
+### 2 Match summary
+
+```{r}
+summary(Match.COPN, standardize = TRUE)
+plot(Match.COPN, type = "jitter")
+plot(Match.COPN, type = "qq")
+plot(Match.COPN, type = "hist")
+bal.tab(Match.COPN)
+```
+
+### 3 Love plot
+
+```{r}
+var.labels <- c(
+  distance             = "Distance",
+  sex                  = "Male sex",
+  study_visit_age      = "Age (years)",
+  yrs_education        = "Education (years)",
+  disease_duration     = "Disease duration (years)",
+  living_environment   = "Rural living environment",
+  Farming              = "Working or living on a farm",
+  led                  = "LED",
+  HY                   = "HY"
+)
+
+love.plot(
+  Match.COPN,
+  stats      = c("mean.diffs", "ks.statistics"),
+  thresholds = c(m = 0.1, ks = 0.1),
+  var.names  = var.labels,
+  sample.names = c("Unmatched", "Matched"),
+  colors     = c("red", "blue"),
+  shapes     = c("triangle", "circle"),
+  binary     = "std",
+  stars      = "raw"
+)
+```
+
+### 4 Export Love plot
+
+```{r}
+library(svglite)
+
+svglite(file = "Plots/LovePlot_mean_diffs.svg", width = 12, height = 8)
+
+love.plot(
+  Match.COPN,
+  stats        = c("mean.diffs", "ks.statistics"),
+  thresholds   = c(m = 0.1, ks = 0.1),
+  var.names    = new.names,
+  sample.names = c("Unmatched", "Matched"),
+  colors       = c("red", "blue"),
+  shapes       = c("triangle", "circle"),
+  binary       = "std",
+  stars        = "raw"
+)
+
+dev.off()
+```
+```
+
+
+
+```{r}
