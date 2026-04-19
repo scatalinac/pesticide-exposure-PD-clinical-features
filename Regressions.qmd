@@ -1,0 +1,58 @@
+---
+title: "Regressions"
+format: html
+editor: visual
+---
+
+```{}
+
+```
+### 1 Logistic regression
+
+```{r}
+library(sandwich)
+library(lmtest)
+
+
+model_binary <- glm(
+  outcome_binary ~ Exposure_Group + sex + study_visit_age + disease_duration +
+    HY + yrs_education + living_environment + Farming + led,
+  data    = Matched_data,
+  family  = binomial
+)
+
+vc <- vcovCL(model_binary, cluster = Matched_data$subclass)
+coeftest(model_binary, vcov. = vc)
+```
+
+### 2 Linear regression
+
+```{r}
+model_continuous <- lm(
+  outcome_continuous ~ Exposure_Group + sex + study_visit_age + disease_duration +
+    HY + yrs_education + living_environment + Farming + led,
+  data = Matched_data
+)
+
+vc <- vcovCL(model_continuous, cluster = Matched_data$subclass)
+coeftest(model_continuous, vcov. = vc)
+```
+
+### 3 Linear regression MDS-UPDRS Part III (adjusted for ON/OFF medication state)
+
+```{r}
+model_continuous_onmed <- lm(
+  outcome_continuous ~ Exposure_Group + sex + study_visit_age + disease_duration +
+    HY + yrs_education + living_environment + Farming + led + On_Med,
+  data = Matched_data
+)
+
+vc <- vcovCL(model_continuous_onmed, cluster = Matched_data$subclass)
+coeftest(model_continuous_onmed, vcov. = vc)
+```
+
+```
+
+
+
+```{r}
